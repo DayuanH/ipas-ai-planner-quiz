@@ -3,163 +3,275 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI應用規劃師 - 自動載入版</title>
+    <title>AI應用規劃師 - 多層級分類測驗系統</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
-        body { font-family: 'Noto Sans TC', sans-serif; background-color: #f8fafc; }
-        .correct { background-color: #10b981 !important; color: white; border-color: #059669; }
-        .incorrect { background-color: #ef4444 !important; color: white; border-color: #dc2626; }
-        .skipped { background-color: #f1f5f9 !important; border-color: #cbd5e1; color: #64748b; }
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #f8fafc; color: #1e293b; }
         .fade-in { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .correct { background-color: #10b981 !important; color: white; border-color: #059669; }
+        .incorrect { background-color: #ef4444 !important; color: white; border-color: #dc2626; }
+        .option-btn:disabled { cursor: default; }
+        .tab-active { border-bottom: 3px solid #4f46e5; color: #4f46e5; font-weight: bold; }
     </style>
 </head>
 <body class="min-h-screen">
 
-    <nav class="bg-slate-900 text-white p-4 sticky top-0 z-50 shadow-md">
+    <nav class="bg-indigo-950 text-white p-4 sticky top-0 z-50 shadow-md">
         <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold cursor-pointer hover:text-blue-400" onclick="showMainMenu()">AI應用規劃師練習</h1>
-            <div id="nav-info" class="text-sm text-slate-400 font-mono italic">Auto-syncing...</div>
+            <h1 class="text-xl font-bold flex items-center gap-2 cursor-pointer" onclick="showMainMenu()">
+                <span class="bg-indigo-500 p-1 rounded">AI</span> 考照深度練習
+            </h1>
+            <div id="status-tag" class="text-xs font-mono text-indigo-300 bg-indigo-900/50 px-3 py-1 rounded-full border border-indigo-800">
+                載入中...
+            </div>
         </div>
     </nav>
 
     <div class="container mx-auto px-4 py-8 max-w-4xl">
-        
-        <!-- 狀態提示區 -->
-        <div id="status-bar" class="mb-6 hidden">
-            <div class="p-4 rounded-xl flex items-center justify-between" id="status-box">
-                <span id="status-text" class="text-sm font-medium"></span>
-                <button onclick="loadFromGithub()" class="text-xs underline opacity-70">重新整理題庫</button>
-            </div>
-        </div>
-
-        <!-- 主選單 -->
-        <div id="main-menu" class="space-y-8 fade-in">
-            <div class="text-center">
-                <h2 class="text-3xl font-bold text-slate-800 mb-2">準備好挑戰了嗎？</h2>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <button onclick="startRandomQuiz()" class="p-8 bg-white rounded-2xl shadow-sm border border-slate-200 text-left hover:border-blue-500 transition-all group">
-                    <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center mb-4 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-slate-800">隨機 10 題</h3>
-                    <p class="text-slate-500 mt-2 text-sm">目前的題庫容量：<span id="data-count" class="font-bold text-blue-600">0</span> 題</p>
+        <!-- 主畫面 -->
+        <div id="home-screen" class="space-y-6 fade-in text-center py-12">
+            <h2 class="text-4xl font-black text-slate-800">115.02 精準測驗模式</h2>
+            <p class="text-slate-500">支援隨機抽題與 L1/L2/L3 多層級主題篩選。</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto mt-8">
+                <button onclick="startQuiz('random')" class="p-6 bg-indigo-600 text-white rounded-2xl font-bold shadow-xl hover:bg-indigo-700 transition-all flex flex-col items-center">
+                    <span class="text-2xl mb-1">⚡</span>
+                    隨機 10 題測驗
                 </button>
-
-                <button onclick="showFilterMenu()" class="p-8 bg-white rounded-2xl shadow-sm border border-slate-200 text-left hover:border-purple-500 transition-all group">
-                    <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-lg flex items-center justify-center mb-4 group-hover:bg-purple-600 group-hover:text-white transition-colors">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-slate-800">分類練習</h3>
-                    <p class="text-slate-500 mt-2 text-sm">針對特定科目進行強化訓練。</p>
+                <button onclick="showCategoryMenu()" class="p-6 bg-white border-2 border-slate-200 text-slate-700 rounded-2xl font-bold hover:border-indigo-500 transition-all flex flex-col items-center">
+                    <span class="text-2xl mb-1">📂</span>
+                    依分類主題練習
                 </button>
             </div>
         </div>
 
         <!-- 分類選單 -->
-        <div id="filter-menu" class="hidden fade-in space-y-6">
-            <div class="flex items-center space-x-2 text-slate-500 mb-4 cursor-pointer hover:text-blue-600" onclick="showMainMenu()">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                <span>返回主頁</span>
+        <div id="category-screen" class="hidden fade-in space-y-6">
+            <div class="flex items-center justify-between">
+                <button onclick="showMainMenu()" class="text-slate-500 hover:text-indigo-600 font-medium flex items-center gap-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    返回
+                </button>
+                <h3 class="text-xl font-bold text-slate-800">選擇測驗維度</h3>
             </div>
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                <div id="list-container" class="space-y-2 max-h-[500px] overflow-y-auto no-scrollbar"></div>
+
+            <!-- 分類層級切換 -->
+            <div class="flex border-b border-slate-200">
+                <button onclick="renderCategories('category_level1')" id="tab-l1" class="flex-1 py-3 text-center text-sm tab-active">Level 1 (大類)</button>
+                <button onclick="renderCategories('category_level2')" id="tab-l2" class="flex-1 py-3 text-center text-sm">Level 2 (中類)</button>
+                <button onclick="renderCategories('category_level3')" id="tab-l3" class="flex-1 py-3 text-center text-sm">Level 3 (小類)</button>
+            </div>
+
+            <div id="category-list" class="grid grid-cols-1 gap-3 py-4">
+                <!-- 由 JS 動態生成 -->
             </div>
         </div>
 
-        <!-- 測驗區域與結果區 (省略以維持重點，邏輯已包含在下方 JS) -->
-        <div id="quiz-container" class="hidden fade-in"></div>
-        <div id="result-page" class="hidden fade-in"></div>
+        <!-- 測驗中 -->
+        <div id="quiz-screen" class="hidden fade-in space-y-6">
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-slate-50 px-6 py-4 border-b border-slate-100 flex justify-between items-center">
+                    <span id="progress-text" class="text-xs font-bold text-slate-400 uppercase">Question 01</span>
+                    <div id="quiz-topic-tag" class="text-[10px] bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded font-bold">隨機練習</div>
+                </div>
+
+                <div class="p-6 md:p-10">
+                    <h3 id="question-text" class="text-xl font-bold leading-relaxed mb-8">題目載入中...</h3>
+                    <div id="options-grid" class="grid grid-cols-1 gap-3"></div>
+
+                    <!-- 解析區塊 -->
+                    <div id="analysis-box" class="hidden mt-10 pt-10 border-t border-slate-100 space-y-6">
+                        <div class="bg-indigo-50 p-6 rounded-2xl border border-indigo-100">
+                            <h4 class="text-indigo-700 font-bold mb-2">💡 核心解析</h4>
+                            <p id="core-explanation" class="text-slate-600 text-sm leading-relaxed"></p>
+                        </div>
+                        <div id="rationale-container" class="space-y-2"></div>
+                        <div class="flex justify-end pt-4">
+                            <button onclick="goToNext()" class="px-10 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-indigo-600 transition-all">下一題</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 結果畫面 -->
+        <div id="result-screen" class="hidden fade-in text-center py-20">
+            <div class="text-6xl mb-6">🏆</div>
+            <h2 class="text-3xl font-black mb-2">測驗完畢</h2>
+            <p class="text-slate-500 mb-8">您的得分：<span id="score-text" class="font-bold text-indigo-600 text-3xl">0</span></p>
+            <button onclick="showMainMenu()" class="px-10 py-4 bg-indigo-600 text-white rounded-2xl font-bold">返回主選單</button>
+        </div>
     </div>
 
     <script>
-        /**
-         * ------------------------------------------------------------------
-         * 在這裡貼上你的 GitHub JSON URL (Raw 連結或普通連結皆可)
-         * ------------------------------------------------------------------
-         */
-        const REMOTE_QUIZ_URL = "https://raw.githubusercontent.com/DayuanH/ipas-ai-planner-quiz/refs/heads/main/AI_100_detail_ver.json"; 
+        const API_URL = "https://raw.githubusercontent.com/DayuanH/ipas-ai-planner-quiz/refs/heads/main/AI_100_detail_ver.json";
+        
+        let allQuestions = [];
+        let currentQuiz = [];
+        let index = 0;
+        let score = 0;
+        let hasAnswered = false;
 
-        let quizData = []; 
-
-        // 初始化：網頁載入後自動執行
-        window.onload = function() {
-            showMainMenu();
-            if (REMOTE_QUIZ_URL && REMOTE_QUIZ_URL !== "https://raw.githubusercontent.com/DayuanH/ipas-ai-planner-quiz/refs/heads/main/AI_100_detail_ver.json") {
-                loadFromGithub();
-            } else {
-                setStatus("請在程式碼中設定 REMOTE_QUIZ_URL", "red");
-            }
-        };
-
-        async function loadFromGithub() {
-            let url = REMOTE_QUIZ_URL.trim();
-            if (!url) return;
-
-            // 自動修正 GitHub 網址
-            if (url.includes("github.com") && !url.includes("raw.githubusercontent.com")) {
-                url = url.replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/");
-            }
-
+        async function loadData() {
             try {
-                setStatus("連線中...", "blue");
-                const response = await fetch(url);
-                if (!response.ok) throw new Error("讀取失敗");
-                
-                const data = await response.json();
-                quizData = Array.isArray(data) ? data : (data.questions || []);
-
-                document.getElementById('data-count').innerText = quizData.length;
-                setStatus(`同步成功 (共 ${quizData.length} 題)`, "green");
-            } catch (err) {
-                setStatus("同步失敗，請檢查程式碼內的網址連結", "red");
+                const res = await fetch(`${API_URL}?t=${Date.now()}`);
+                const data = await res.json();
+                allQuestions = data.questions || data;
+                document.getElementById('status-tag').innerText = `已載入 ${allQuestions.length} 題`;
+            } catch (e) {
+                document.getElementById('status-tag').innerText = "連線失敗";
             }
-        }
-
-        function setStatus(text, color) {
-            const bar = document.getElementById('status-bar');
-            const box = document.getElementById('status-box');
-            const txt = document.getElementById('status-text');
-            bar.classList.remove('hidden');
-            txt.innerText = text;
-            box.className = "p-4 rounded-xl flex items-center justify-between ";
-            if (color === 'red') box.classList.add('bg-red-50', 'text-red-700', 'border', 'border-red-100');
-            else if (color === 'green') box.classList.add('bg-green-50', 'text-green-700', 'border', 'border-green-100');
-            else box.classList.add('bg-blue-50', 'text-blue-700', 'border', 'border-blue-100');
         }
 
         function showMainMenu() {
-            document.querySelectorAll('.fade-in').forEach(el => el.classList.add('hidden'));
-            document.getElementById('main-menu').classList.remove('hidden');
+            hideAll();
+            document.getElementById('home-screen').classList.remove('hidden');
         }
 
-        function showFilterMenu() {
-            if (quizData.length === 0) return;
-            document.querySelectorAll('.fade-in').forEach(el => el.classList.add('hidden'));
-            document.getElementById('filter-menu').classList.remove('hidden');
-            renderFilterList();
+        function showCategoryMenu() {
+            hideAll();
+            document.getElementById('category-screen').classList.remove('hidden');
+            renderCategories('category_level1');
         }
 
-        function renderFilterList() {
-            const container = document.getElementById('list-container');
-            const subjects = [...new Set(quizData.map(q => q.subject_name || "未分類"))];
-            container.innerHTML = subjects.map(sub => `
-                <button onclick="startQuizBySubject('${sub}')" class="w-full flex justify-between items-center p-4 bg-slate-50 rounded-xl mb-2 hover:bg-white border border-transparent hover:border-slate-200 transition-all text-sm font-medium">
-                    <span>${sub}</span>
-                    <span class="bg-blue-100 text-blue-600 px-2 py-1 rounded text-xs">${quizData.filter(q=>q.subject_name === sub).length} 題</span>
-                </button>
-            `).join('');
+        function renderCategories(level) {
+            // 更新 Tab 樣式
+            ['tab-l1', 'tab-l2', 'tab-l3'].forEach(id => {
+                document.getElementById(id).classList.remove('tab-active');
+            });
+            const tabId = level === 'category_level1' ? 'tab-l1' : level === 'category_level2' ? 'tab-l2' : 'tab-l3';
+            document.getElementById(tabId).classList.add('tab-active');
+
+            const container = document.getElementById('category-list');
+            container.innerHTML = '';
+
+            // 提取分類與計數
+            const counts = {};
+            allQuestions.forEach(q => {
+                const cat = q[level] || "未分類";
+                counts[cat] = (counts[cat] || 0) + 1;
+            });
+
+            Object.keys(counts).sort().forEach(cat => {
+                const btn = document.createElement('button');
+                btn.className = "flex justify-between items-center p-4 bg-white border border-slate-200 rounded-xl hover:border-indigo-500 transition-all text-left group";
+                btn.innerHTML = `
+                    <div>
+                        <div class="text-xs text-slate-400 font-bold mb-0.5 uppercase">${level.replace('_', ' ')}</div>
+                        <div class="font-bold text-slate-700 group-hover:text-indigo-600 transition-colors">${cat}</div>
+                    </div>
+                    <span class="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full text-xs font-mono">${counts[cat]} 題</span>
+                `;
+                btn.onclick = () => startQuiz(level, cat);
+                container.appendChild(btn);
+            });
         }
 
-        // 測驗啟動邏輯（隨機/分類）略，可依需要補上標準測驗循環
-        function startRandomQuiz() {
-            if (quizData.length === 0) return;
-            alert('開始測驗隨機 10 題（邏輯已就緒）');
+        function startQuiz(type, value = null) {
+            if (type === 'random') {
+                currentQuiz = [...allQuestions].sort(() => 0.5 - Math.random()).slice(0, 10);
+                document.getElementById('quiz-topic-tag').innerText = "隨機 10 題";
+            } else {
+                currentQuiz = allQuestions.filter(q => (q[type] || "未分類") === value).sort(() => 0.5 - Math.random());
+                document.getElementById('quiz-topic-tag').innerText = `${value} (${currentQuiz.length}題)`;
+            }
+
+            index = 0; score = 0;
+            hideAll();
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            renderQuestion();
         }
+
+        function renderQuestion() {
+            hasAnswered = false;
+            const q = currentQuiz[index];
+            document.getElementById('progress-text').innerText = `Question ${String(index + 1).padStart(2, '0')} / ${currentQuiz.length}`;
+            document.getElementById('question-text').innerText = q.question;
+            document.getElementById('analysis-box').classList.add('hidden');
+            
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+
+            const options = q.answerOptions || q.options;
+            options.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.className = "option-btn w-full text-left p-5 rounded-2xl border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50 transition-all font-medium flex gap-4";
+                const label = String.fromCharCode(65 + i);
+                const text = typeof opt === 'string' ? opt : opt.text;
+                btn.innerHTML = `<span class="w-7 h-7 flex-shrink-0 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center text-xs font-bold">${label}</span> <span>${text}</span>`;
+                btn.onclick = () => handleSelect(i, q, btn);
+                grid.appendChild(btn);
+            });
+        }
+
+        function handleSelect(selectedIdx, q, btn) {
+            if (hasAnswered) return;
+            hasAnswered = true;
+            const btns = document.querySelectorAll('.option-btn');
+            const correctIdx = q.answer !== undefined ? q.answer : (q.answerOptions ? q.answerOptions.findIndex(o => o.isCorrect) : -1);
+
+            btns.forEach((b, i) => {
+                b.disabled = true;
+                if (i === correctIdx) b.classList.add('correct');
+                else if (i === selectedIdx) b.classList.add('incorrect');
+            });
+
+            if (selectedIdx === correctIdx) score += (100 / currentQuiz.length);
+            showAnalysis(q, correctIdx);
+        }
+
+        function showAnalysis(q, correctIdx) {
+            const box = document.getElementById('analysis-box');
+            const rationaleContainer = document.getElementById('rationale-container');
+            box.classList.remove('hidden');
+            document.getElementById('core-explanation').innerText = q.explanation || "參考解答如上。";
+            rationaleContainer.innerHTML = '';
+            
+            const labels = ["A", "B", "C", "D"];
+            labels.forEach((label, i) => {
+                const isCorrect = (i === correctIdx);
+                // 優先讀取 option_explanations 欄位
+                const explanation = q.option_explanations ? q.option_explanations[label] : 
+                                   (q.answerOptions && q.answerOptions[i] ? q.answerOptions[i].rationale : null);
+                
+                if (explanation) {
+                    const div = document.createElement('div');
+                    div.className = `p-4 rounded-xl text-sm border-l-4 ${isCorrect ? 'bg-green-50 border-green-500' : 'bg-slate-50 border-slate-300'}`;
+                    div.innerHTML = `
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="font-bold text-slate-700">選項 ${label}</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded ${isCorrect ? 'bg-green-200 text-green-700' : 'bg-slate-200 text-slate-500'}">
+                                ${isCorrect ? '正確' : '錯誤'}
+                            </span>
+                        </div>
+                        <p class="text-slate-600 leading-relaxed">${explanation}</p>
+                    `;
+                    rationaleContainer.appendChild(div);
+                }
+            });
+            setTimeout(() => box.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+        }
+
+        function goToNext() {
+            index++;
+            if (index < currentQuiz.length) renderQuestion();
+            else finish();
+        }
+
+        function finish() {
+            hideAll();
+            document.getElementById('result-screen').classList.remove('hidden');
+            document.getElementById('score-text').innerText = Math.round(score);
+        }
+
+        function hideAll() {
+            ['home-screen', 'category-screen', 'quiz-screen', 'result-screen'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+        }
+
+        loadData();
     </script>
 </body>
 </html>
