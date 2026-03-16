@@ -82,14 +82,14 @@
          * 在這裡貼上你的 GitHub JSON URL (Raw 連結或普通連結皆可)
          * ------------------------------------------------------------------
          */
-        const REMOTE_QUIZ_URL = "https://raw.githubusercontent.com/DayuanH/ipas-ai-planner-quiz/refs/heads/main/AI%E6%87%89%E7%94%A8%E8%A6%8F%E5%8A%83%E5%B8%AB%E5%AE%8C%E6%95%B4100%E9%A1%8C%E9%A1%8C%E5%BA%AB_%E6%95%99%E5%AD%B8%E8%A9%B3%E8%A7%A3%E7%89%88.json"; 
+        const REMOTE_QUIZ_URL = "AI_100_detail_ver.json"; 
 
         let quizData = []; 
 
         // 初始化：網頁載入後自動執行
         window.onload = function() {
             showMainMenu();
-            if (REMOTE_QUIZ_URL && REMOTE_QUIZ_URL !== "https://raw.githubusercontent.com/DayuanH/ipas-ai-planner-quiz/refs/heads/main/AI%E6%87%89%E7%94%A8%E8%A6%8F%E5%8A%83%E5%B8%AB%E5%AE%8C%E6%95%B4100%E9%A1%8C%E9%A1%8C%E5%BA%AB_%E6%95%99%E5%AD%B8%E8%A9%B3%E8%A7%A3%E7%89%88.json") {
+            if (REMOTE_QUIZ_URL && REMOTE_QUIZ_URL !== "AI_100_detail_ver.json") {
                 loadFromGithub();
             } else {
                 setStatus("請在程式碼中設定 REMOTE_QUIZ_URL", "red");
