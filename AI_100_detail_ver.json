@@ -935,12 +935,12 @@
 "id": 32,
 "question_no": 32,
 "question": "在統計推論中，若樣本來自母體但呈現明顯偏態分布，且樣本數有限， 下列哪一項策略最能減少推估母體參數的偏誤？",
-"category_level1": "L99",
-"category_level1_name": "其他",
-"category_level2": "L999",
-"category_level2_name": "其他／無法明確分類",
-"category_level3": "L99901",
-"category_level3_name": "其他／無法明確分類",
+"category_level1": "L11",
+"category_level1_name": "人工智慧基礎概論",
+"category_level2": "L112",
+"category_level2_name": "資料處理與分析概念",
+"category_level3": "L11202",
+"category_level3_name": "資料整理與分析流程",
 "keywords": [
 "其他／無法明確分類"
 ],
